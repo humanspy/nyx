@@ -1,0 +1,15 @@
+{
+  "name": "chats-by-spygroupdev",
+  "version": "0.0.1",
+  "private": true,
+  "description": "A privacy-first, end-to-end encrypted communication platform.",
+  "scripts": {
+    "api": "npm run dev --workspace=api",
+    "web": "npm run dev --workspace=web"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "author": "",
+  "license": "ISC"
+}

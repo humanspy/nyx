@@ -1,0 +1,63 @@
+.app {
+  display: flex;
+  height: 100vh;
+  background-color: #36393f;
+  color: white;
+}
+
+.servers-list {
+  width: 70px;
+  background-color: #202225;
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.server-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #36393f;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: border-radius 0.3s, background-color 0.3s;
+}
+
+.server-icon.active,
+.server-icon:hover {
+  background-color: #7289da;
+  border-radius: 15px;
+}
+
+.channels-list {
+  width: 240px;
+  background-color: #2f3136;
+  padding: 10px;
+}
+
+.channels-list h2 {
+  margin-top: 0;
+  font-size: 1.2em;
+  border-bottom: 1px solid #202225;
+  padding-bottom: 10px;
+}
+
+.channel-item {
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.channel-item.active,
+.channel-item:hover {
+  background-color: #40444b;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+}
