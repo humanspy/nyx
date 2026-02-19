@@ -1,13 +1,16 @@
 [build]
   builder = "NIXPACKS"
 
+[deploy]
+  startCommand = "node packages/api/index.js"
+
 [[services]]
   name = "nyx-backend"
   source = "backend"
   [services.build]
     buildCommand = "npm install"
   [services.deploy]
-    startCommand = "node src/index.js"
+    startCommand = "node src/server.js"
     healthcheckPath = "/api/health"
     restartPolicyType = "ON_FAILURE"
     restartPolicyMaxRetries = 5

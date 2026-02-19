@@ -4,6 +4,7 @@
   "private": true,
   "description": "A privacy-first, end-to-end encrypted communication platform.",
   "scripts": {
+    "start": "node packages/api/index.js",
     "api": "npm run dev --workspace=api",
     "web": "npm run dev --workspace=web"
   },
