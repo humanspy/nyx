@@ -23,6 +23,7 @@ import automodRouter from './routes/automod.js';
 import adminRouter from './routes/admin.js';
 import { initGateway } from './websocket/gateway.js';
 import pool from './config/database.js';
+import { migrate } from '../database/migrate.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -73,5 +74,7 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3001;
-httpServer.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+migrate()
+  .then(() => httpServer.listen(PORT, () => console.log(`Server running on port ${PORT}`)))
+  .catch((err) => { console.error('[migrate] Fatal:', err); process.exit(1); });
 export default app;

@@ -5,24 +5,49 @@ import pool from '../src/config/database.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-async function migrate() {
+const FILES = [
+  '001_initial.sql',
+  '002_music.sql',
+  '003_server_tags.sql',
+  '004_voice_features.sql',
+  '005_account_deletion.sql',
+  '006_email_reports_mutes_automod.sql',
+];
+
+export async function migrate() {
   const client = await pool.connect();
   try {
-    console.log('Running migrations...');
-    const files = ['001_initial.sql', '002_music.sql', '003_server_tags.sql', '004_voice_features.sql', '005_account_deletion.sql', '006_email_reports_mutes_automod.sql'];
-    for (const file of files) {
+    // Create tracking table if it doesn't exist
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS _migrations (
+        name TEXT PRIMARY KEY,
+        applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `);
+
+    const { rows } = await client.query('SELECT name FROM _migrations');
+    const applied = new Set(rows.map((r) => r.name));
+
+    for (const file of FILES) {
+      if (applied.has(file)) {
+        console.log(`[migrate] Skipping (already applied): ${file}`);
+        continue;
+      }
       const sql = readFileSync(join(__dirname, 'migrations', file), 'utf8');
       await client.query(sql);
-      console.log(`  Applied: ${file}`);
+      await client.query('INSERT INTO _migrations (name) VALUES ($1)', [file]);
+      console.log(`[migrate] Applied: ${file}`);
     }
-    console.log('Migrations completed successfully.');
-  } catch (err) {
-    console.error('Migration failed:', err);
-    process.exit(1);
+
+    console.log('[migrate] Done.');
   } finally {
     client.release();
-    await pool.end();
   }
 }
 
-migrate();
+// Allow running directly: node database/migrate.js
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  migrate()
+    .then(() => pool.end())
+    .catch((err) => { console.error('[migrate] Failed:', err); process.exit(1); });
+}
