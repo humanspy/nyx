@@ -44,8 +44,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 if (process.env.NODE_ENV !== 'production') app.use(morgan('dev'));
 
 app.get('/health', async (req, res) => {
-  try { await pool.query('SELECT 1'); res.json({ status: 'ok', timestamp: new Date().toISOString() }); }
-  catch { res.status(503).json({ status: 'degraded' }); }
+  let db = 'ok';
+  try { await pool.query('SELECT 1'); } catch { db = 'degraded'; }
+  res.json({ status: 'ok', db, timestamp: new Date().toISOString() });
 });
 
 app.use('/api/auth', authRouter);

@@ -61,8 +61,18 @@ export function useWebSocket() {
     if (!token) return;
     if (ws.current) { ws.current.close(); ws.current = null; }
 
-    const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-    const socket = new WebSocket(`${protocol}://${location.host}/ws`);
+    let wsUrl;
+    const apiBase = import.meta.env.VITE_API_BASE;
+    if (apiBase) {
+      const u = new URL(apiBase);
+      u.protocol = u.protocol === 'https:' ? 'wss:' : 'ws:';
+      u.pathname = '/ws';
+      wsUrl = u.toString();
+    } else {
+      const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
+      wsUrl = `${protocol}://${location.host}/ws`;
+    }
+    const socket = new WebSocket(wsUrl);
     ws.current = socket;
 
     socket.onopen = () => {

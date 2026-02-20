@@ -64,13 +64,11 @@ Railway injects these automatically when you attach a Bucket service. You should
 
 ## Frontend Service
 
-The frontend is a static Vite build — it has no runtime env vars. All API calls go through `/api` which is proxied to the backend.
-
-If you need to set the API base URL at build time, set:
+The frontend is a static Vite build. On Railway the frontend and backend are **separate services on separate domains**, so you must set the backend URL at build time on the **frontend** service.
 
 | Variable | Example | Notes |
 |---|---|---|
-| `VITE_API_BASE` | `https://nyx-api.railway.app` | Only needed if frontend and backend are on separate domains |
+| `VITE_API_BASE` | `https://nyx-backend.up.railway.app` | **Required.** The backend service's public URL. Used for all API calls and the WebSocket connection. |
 
 ---
 
@@ -98,10 +96,14 @@ MAX_FILE_SIZE_MB=1024
 
 ## Railway Deployment Checklist
 
+**Backend service:**
 1. Add **PostgreSQL** plugin → `DATABASE_URL` injected automatically
 2. Add **Redis** plugin → `REDIS_URL` injected automatically
 3. Add **Bucket** service → `RAILWAY_BUCKET_*` injected automatically
 4. Set `JWT_SECRET` and `JWT_REFRESH_SECRET` manually (generate with crypto above)
-5. Set `CORS_ORIGIN` to `https://nyx.spygroup.dev`
+5. Set `CORS_ORIGIN` to your frontend's public URL (e.g. `https://nyx.spygroup.dev`)
 6. Set `NODE_ENV` to `production`
 7. Run database migrations: `node backend/database/migrate.js`
+
+**Frontend service:**
+8. Set `VITE_API_BASE` to the backend's public Railway URL (e.g. `https://nyx-backend.up.railway.app`)
