@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 export default function PrivacyPage() {
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', overflowY: 'auto' }}>
+    <div style={{ height: '100%', background: 'var(--bg-primary)', overflowY: 'auto' }}>
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '48px 24px' }}>
         <div style={{ marginBottom: 32 }}>
           <Link to="/" style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>← Back to NYX</Link>
