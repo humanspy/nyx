@@ -230,7 +230,7 @@ router.post('/:serverId/invites', requireServerMember, async (req, res) => {
   const code = Math.random().toString(36).slice(2, 10).toUpperCase();
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   const { rows } = await pool.query(
-    'INSERT INTO server_invites (server_id, created_by, code, expires_at) VALUES ($1,$2,$3,$4) RETURNING code',
+    'INSERT INTO server_invites (server_id, creator_id, code, expires_at) VALUES ($1,$2,$3,$4) RETURNING code',
     [req.params.serverId, req.user.id, code, expiresAt]
   );
   res.json({ code: rows[0].code });

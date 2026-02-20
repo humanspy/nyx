@@ -106,6 +106,9 @@ export const channelsApi = {
   createForumThread: (id, data) => api.post(`/channels/${id}/threads`, data),
   closeForumThread: (id, threadId) => api.patch(`/channels/${id}/threads/${threadId}`, { closed: true }),
   deleteForumThread: (id, threadId) => api.delete(`/channels/${id}/threads/${threadId}`),
+  getPermissions: (id) => api.get(`/channels/${id}/permissions`),
+  setPermission: (id, targetType, targetId, allow, deny) => api.put(`/channels/${id}/permissions/${targetType}/${targetId}`, { allow, deny }),
+  deletePermission: (id, targetType, targetId) => api.delete(`/channels/${id}/permissions/${targetType}/${targetId}`),
 };
 
 // Messages

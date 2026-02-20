@@ -46,7 +46,7 @@ export default function CreateServerModal({ onClose }) {
           <div className="form-group">
             <label className="form-label">Vanity URL <span style={{ color: 'var(--color-text-faint)', fontWeight: 400, textTransform: 'none' }}>(optional)</span></label>
             <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
-              <span style={{ padding: '8px 10px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRight: 'none', borderRadius: 'var(--radius-md) 0 0 var(--radius-md)', fontSize: 14, color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>nexus.app/</span>
+              <span style={{ padding: '8px 10px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRight: 'none', borderRadius: 'var(--radius-md) 0 0 var(--radius-md)', fontSize: 14, color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>nyx.spygaming.dev/</span>
               <input
                 value={vanityUrl}
                 onChange={e => setVanityUrl(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}

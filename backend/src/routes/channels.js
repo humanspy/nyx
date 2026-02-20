@@ -119,9 +119,8 @@ router.post('/group-dm', async (req, res) => {
 // Channel E2E key distribution
 router.get('/:channelId/key', async (req, res) => {
   const { rows } = await pool.query(`
-    SELECT ck.encrypted_key, ck.key_nonce, ck.key_version, u.enc_public_key AS sender_public_key
+    SELECT ck.encrypted_key, ck.key_nonce, ck.key_version
     FROM channel_keys ck
-    JOIN users u ON u.id = ck.distributor_id
     WHERE ck.channel_id=$1 AND ck.user_id=$2
     ORDER BY ck.key_version DESC LIMIT 1
   `, [req.params.channelId, req.user.id]);
@@ -136,6 +135,39 @@ router.post('/:channelId/key', async (req, res) => {
     VALUES ($1,$2,$3,$4,$5,$6)
     ON CONFLICT (channel_id, user_id, key_version) DO UPDATE SET encrypted_key=EXCLUDED.encrypted_key, updated_at=NOW()
   `, [req.params.channelId, userId, req.user.id, encryptedKey, nonce, keyVersion||1]);
+  res.json({ ok: true });
+});
+
+// Channel permission overrides
+router.get('/:channelId/permissions', async (req, res) => {
+  const { rows } = await pool.query(
+    'SELECT target_type, target_id, allow_bits, deny_bits FROM channel_permission_overrides WHERE channel_id=$1',
+    [req.params.channelId]
+  );
+  res.json(rows);
+});
+
+router.put('/:channelId/permissions/:targetType/:targetId', async (req, res) => {
+  const { channelId, targetType, targetId } = req.params;
+  const { allow, deny } = req.body;
+  if (!['role', 'member'].includes(targetType)) return res.status(400).json({ error: 'Invalid targetType' });
+  const { rows: chanRows } = await pool.query('SELECT server_id FROM channels WHERE id=$1', [channelId]);
+  if (!chanRows[0]) return res.status(404).json({ error: 'Channel not found' });
+  if (!await hasPermission(chanRows[0].server_id, req.user.id, 'manage_channels')) return res.status(403).json({ error: 'Missing permission' });
+  await pool.query(`
+    INSERT INTO channel_permission_overrides (channel_id, target_type, target_id, allow_bits, deny_bits)
+    VALUES ($1,$2,$3,$4,$5)
+    ON CONFLICT (channel_id, target_type, target_id) DO UPDATE SET allow_bits=$4, deny_bits=$5, updated_at=NOW()
+  `, [channelId, targetType, targetId, BigInt(allow ?? 0), BigInt(deny ?? 0)]);
+  res.json({ ok: true });
+});
+
+router.delete('/:channelId/permissions/:targetType/:targetId', async (req, res) => {
+  const { channelId, targetType, targetId } = req.params;
+  const { rows: chanRows } = await pool.query('SELECT server_id FROM channels WHERE id=$1', [channelId]);
+  if (!chanRows[0]) return res.status(404).json({ error: 'Channel not found' });
+  if (!await hasPermission(chanRows[0].server_id, req.user.id, 'manage_channels')) return res.status(403).json({ error: 'Missing permission' });
+  await pool.query('DELETE FROM channel_permission_overrides WHERE channel_id=$1 AND target_type=$2 AND target_id=$3', [channelId, targetType, targetId]);
   res.json({ ok: true });
 });
 

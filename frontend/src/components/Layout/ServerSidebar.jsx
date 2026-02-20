@@ -22,7 +22,7 @@ export default function ServerSidebar() {
       width: 72, minWidth: 72, background: 'var(--bg-primary)',
       borderRight: '1px solid var(--border-color)',
       display: 'flex', flexDirection: 'column', alignItems: 'center',
-      paddingTop: 8, paddingBottom: 8, gap: 4, overflowY: 'auto',
+      paddingTop: 8, paddingBottom: 60, gap: 4, overflowY: 'auto',
     }}>
       {/* DMs / Home */}
       <ServerIcon label="Direct Messages" active={!activeServerId} onClick={() => { setActiveServer(null); navigate('/'); }}>

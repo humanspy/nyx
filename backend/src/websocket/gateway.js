@@ -74,6 +74,7 @@ async function handleIdentify(ws, data) {
 }
 
 function handleSubscribe(ws, data) {
+  if (!data) return;
   const { channelIds } = data;
   if (!Array.isArray(channelIds)) return;
   for (const channelId of channelIds) {

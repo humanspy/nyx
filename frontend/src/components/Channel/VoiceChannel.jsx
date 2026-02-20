@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff, Video, VideoOff, Headphones, HeadphoneOff, PhoneOff, Volume2, Monitor, MonitorOff, Users } from 'lucide-react';
+import { Mic, MicOff, Video, VideoOff, Headphones, HeadphoneOff, PhoneOff, Volume2, Monitor, MonitorOff, Users, MessageSquare, Settings } from 'lucide-react';
 import { useVoice } from '../../hooks/useVoice.js';
 import { useServerStore } from '../../store/serverStore.js';
 import { useAuthStore } from '../../store/authStore.js';
@@ -7,11 +7,14 @@ import { voiceApi } from '../../utils/api.js';
 import TextChannel from './TextChannel.jsx';
 import MusicPlayer from '../Voice/MusicPlayer.jsx';
 import { getInitials } from '../../utils/helpers.js';
+import ChannelSettings from './ChannelSettings.jsx';
 
 export default function VoiceChannel({ channel, sendTypingStart, sendTypingStop, sendMusicCommand }) {
   const { activeServerId, getPairedVoiceTextChannel, members } = useServerStore();
   const { user } = useAuthStore();
   const [serverParticipants, setServerParticipants] = useState([]);
+  const [showVoiceText, setShowVoiceText] = useState(false);
+  const [showChannelSettings, setShowChannelSettings] = useState(false);
 
   const { joined, muted, deafened, videoEnabled, screensharing, participants,
     join, leave, toggleMute, toggleDeafen, toggleVideo, toggleScreenshare } = useVoice(
@@ -74,8 +77,33 @@ export default function VoiceChannel({ channel, sendTypingStart, sendTypingStop,
               Channel full
             </span>
           )}
-          <div style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--color-text-faint)', display: 'flex', alignItems: 'center', gap: 4 }}>
-            🔒 E2E Encrypted
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 11, color: 'var(--color-text-faint)' }}>🔒 E2E Encrypted</span>
+            {pairedTextChannel && (
+              <button
+                onClick={() => setShowVoiceText(v => !v)}
+                title={showVoiceText ? 'Hide text chat' : 'Open text chat'}
+                style={{
+                  width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  borderRadius: 6, cursor: 'pointer',
+                  background: showVoiceText ? 'var(--bg-active)' : 'var(--bg-hover)',
+                  color: showVoiceText ? 'var(--color-accent)' : 'var(--color-text-muted)',
+                }}
+              >
+                <MessageSquare size={15} />
+              </button>
+            )}
+            <button
+              onClick={() => setShowChannelSettings(true)}
+              title="Channel Settings"
+              style={{
+                width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                borderRadius: 6, cursor: 'pointer',
+                background: 'var(--bg-hover)', color: 'var(--color-text-muted)',
+              }}
+            >
+              <Settings size={15} />
+            </button>
           </div>
         </div>
 
@@ -131,8 +159,8 @@ export default function VoiceChannel({ channel, sendTypingStart, sendTypingStop,
         </div>
       </div>
 
-      {/* Paired voice-text channel */}
-      {pairedTextChannel && (
+      {/* Paired voice-text channel (toggled) */}
+      {pairedTextChannel && showVoiceText && (
         <div style={{ width: 360, minWidth: 360, borderLeft: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <TextChannel
             channel={pairedTextChannel}
@@ -141,6 +169,14 @@ export default function VoiceChannel({ channel, sendTypingStart, sendTypingStop,
             sendMusicCommand={sendMusicCommand}
           />
         </div>
+      )}
+
+      {showChannelSettings && (
+        <ChannelSettings
+          channel={channel}
+          serverId={activeServerId}
+          onClose={() => setShowChannelSettings(false)}
+        />
       )}
     </div>
   );

@@ -26,6 +26,7 @@ import pool from './config/database.js';
 import { migrate } from '../database/migrate.js';
 
 const app = express();
+app.set('trust proxy', 1);
 const httpServer = createServer(app);
 
 const wss = new WebSocketServer({ server: httpServer, path: '/ws' });

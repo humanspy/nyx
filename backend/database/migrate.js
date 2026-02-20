@@ -12,6 +12,7 @@ const FILES = [
   '004_voice_features.sql',
   '005_account_deletion.sql',
   '006_email_reports_mutes_automod.sql',
+  '007_channel_permissions.sql',
 ];
 
 export async function migrate() {
