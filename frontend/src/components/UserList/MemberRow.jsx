@@ -32,7 +32,7 @@ export default function MemberRow({ member, roles, ownerId, showCrown, presenceD
         display: 'flex', alignItems: 'center', gap: 8,
         padding: '4px 8px', borderRadius: 6,
         cursor: onClick ? 'pointer' : 'default',
-        opacity: status === 'offline' ? 0.5 : 1,
+        opacity: (status === 'offline' || status === 'invisible') ? 0.5 : 1,
         transition: 'background 0.1s',
       }}
       onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}

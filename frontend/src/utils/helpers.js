@@ -83,8 +83,9 @@ export function groupMembersByRole(members, roles, ownerId) {
     groups.push({ role, members: roleMembers });
   }
 
-  const online = members.filter(m => !assigned.has(m.user_id) && m.status !== 'offline');
-  const offline = members.filter(m => !assigned.has(m.user_id) && m.status === 'offline');
+  const isVisible = s => s && s !== 'offline' && s !== 'invisible';
+  const online = members.filter(m => !assigned.has(m.user_id) && isVisible(m.status));
+  const offline = members.filter(m => !assigned.has(m.user_id) && !isVisible(m.status));
 
   if (online.length) groups.push({ role: null, label: `Online — ${online.length}`, members: online });
   if (offline.length) groups.push({ role: null, label: `Offline — ${offline.length}`, members: offline });

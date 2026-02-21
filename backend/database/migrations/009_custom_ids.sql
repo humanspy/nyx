@@ -283,8 +283,18 @@ BEGIN
   ALTER TABLE user_settings      ADD CONSTRAINT user_settings_ringtone_file_id_fkey  FOREIGN KEY (ringtone_file_id)   REFERENCES media_files(id) ON DELETE SET NULL;
 
   -- ── Add FK constraints for friendships (now that users.id is TEXT) ────────
-  ALTER TABLE friendships        ADD CONSTRAINT IF NOT EXISTS friendships_requester_id_fkey FOREIGN KEY (requester_id) REFERENCES users(id) ON DELETE CASCADE;
-  ALTER TABLE friendships        ADD CONSTRAINT IF NOT EXISTS friendships_addressee_id_fkey FOREIGN KEY (addressee_id) REFERENCES users(id) ON DELETE CASCADE;
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.table_constraints
+    WHERE table_schema = 'public' AND constraint_name = 'friendships_requester_id_fkey'
+  ) THEN
+    ALTER TABLE friendships ADD CONSTRAINT friendships_requester_id_fkey FOREIGN KEY (requester_id) REFERENCES users(id) ON DELETE CASCADE;
+  END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.table_constraints
+    WHERE table_schema = 'public' AND constraint_name = 'friendships_addressee_id_fkey'
+  ) THEN
+    ALTER TABLE friendships ADD CONSTRAINT friendships_addressee_id_fkey FOREIGN KEY (addressee_id) REFERENCES users(id) ON DELETE CASCADE;
+  END IF;
 
 END $$;
 
@@ -293,9 +303,14 @@ DO $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM information_schema.table_constraints
-    WHERE table_name = 'friendships' AND constraint_name = 'friendships_requester_id_fkey'
+    WHERE table_schema = 'public' AND table_name = 'friendships' AND constraint_name = 'friendships_requester_id_fkey'
   ) THEN
     ALTER TABLE friendships ADD CONSTRAINT friendships_requester_id_fkey FOREIGN KEY (requester_id) REFERENCES users(id) ON DELETE CASCADE;
+  END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.table_constraints
+    WHERE table_schema = 'public' AND table_name = 'friendships' AND constraint_name = 'friendships_addressee_id_fkey'
+  ) THEN
     ALTER TABLE friendships ADD CONSTRAINT friendships_addressee_id_fkey FOREIGN KEY (addressee_id) REFERENCES users(id) ON DELETE CASCADE;
   END IF;
 END $$;

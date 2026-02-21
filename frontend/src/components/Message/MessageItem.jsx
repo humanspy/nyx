@@ -19,11 +19,11 @@ export default function MessageItem({ message, prevMessage, channelId }) {
   const [history, setHistory] = useState([]);
   const [showReport, setShowReport] = useState(false);
 
-  const isOwn = message.author_id === user?.id;
+  const isOwn = message.sender_id === user?.id;
   const isSystem = message.type === 'system';
-  const isDeleted = !!message.deleted_at;
+  const isDeleted = !!message.deleted;
 
-  const prevIsSameAuthor = prevMessage?.author_id === message.author_id
+  const prevIsSameAuthor = prevMessage?.sender_id === message.sender_id
     && (new Date(message.created_at) - new Date(prevMessage.created_at)) < 5 * MINUTE;
 
   const displayName = message.display_name || message.username || 'Unknown';

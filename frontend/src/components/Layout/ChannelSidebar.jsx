@@ -21,7 +21,7 @@ const CHANNEL_ICONS = {
 };
 
 function getChannelIcon(ch) {
-  if (ch.type === 'text' && /\brules?\b/i.test(ch.name)) return BookOpen;
+  if (ch.type === 'text' && /rules?/i.test(ch.name)) return BookOpen;
   return CHANNEL_ICONS[ch.type] || Hash;
 }
 

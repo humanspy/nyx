@@ -16,7 +16,7 @@ export const useMessageStore = create((set, get) => ({
     const channelKey = await getChannelKey(channelId);
 
     const decrypted = await Promise.all(raw.map(async m => {
-      if (m.deleted_at) return { ...m, content: '[deleted]' };
+      if (m.deleted) return { ...m, content: '[deleted]' };
       if (!channelKey || !m.encrypted_payload) return { ...m, content: m.encrypted_payload || '' };
       const content = await decryptMessage(channelKey, m.encrypted_payload);
       return { ...m, content: content ?? '[unable to decrypt]' };
@@ -93,7 +93,7 @@ export const useMessageStore = create((set, get) => ({
       return {
         messages: {
           ...s.messages,
-          [channelId]: list.map(m => m.id === messageId ? { ...m, content: '[deleted]', deleted_at: new Date().toISOString() } : m),
+          [channelId]: list.map(m => m.id === messageId ? { ...m, content: '[deleted]', deleted: true } : m),
         },
       };
     });

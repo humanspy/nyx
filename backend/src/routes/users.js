@@ -135,6 +135,21 @@ router.get('/search', async (req, res) => {
   res.json(rows);
 });
 
+router.get('/me/dms', async (req, res) => {
+  const { rows } = await pool.query(`
+    SELECT c.id, c.type, c.name, c.updated_at,
+      json_agg(jsonb_build_object('id', u.id, 'username', u.username, 'avatar_url', u.avatar_url)) AS participants
+    FROM channels c
+    JOIN channel_members cm ON cm.channel_id = c.id AND cm.user_id = $1
+    JOIN channel_members cm2 ON cm2.channel_id = c.id
+    JOIN users u ON u.id = cm2.user_id
+    WHERE c.is_dm = true
+    GROUP BY c.id
+    ORDER BY c.updated_at DESC
+  `, [req.user.id]);
+  res.json(rows);
+});
+
 router.get('/:userId', async (req, res) => {
   const { rows } = await pool.query(
     'SELECT id, username, display_name, avatar_url, banner_url, created_at FROM users WHERE id = $1',
@@ -149,21 +164,6 @@ router.get('/:userId/keys', async (req, res) => {
     'SELECT key_type, public_key, key_version FROM user_keys WHERE user_id = $1 ORDER BY key_version DESC',
     [req.params.userId]
   );
-  res.json(rows);
-});
-
-router.get('/me/dms', async (req, res) => {
-  const { rows } = await pool.query(`
-    SELECT c.id, c.type, c.name, c.updated_at,
-      json_agg(jsonb_build_object('id', u.id, 'username', u.username, 'avatar_url', u.avatar_url)) AS participants
-    FROM channels c
-    JOIN channel_members cm ON cm.channel_id = c.id AND cm.user_id = $1
-    JOIN channel_members cm2 ON cm2.channel_id = c.id
-    JOIN users u ON u.id = cm2.user_id
-    WHERE c.is_dm = true
-    GROUP BY c.id
-    ORDER BY c.updated_at DESC
-  `, [req.user.id]);
   res.json(rows);
 });
 
