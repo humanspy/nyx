@@ -14,7 +14,7 @@ function checkPassword(pw) {
 
 export default function AuthPage() {
   const [mode, setMode] = useState('login');
-  const [form, setForm] = useState({ username: '', email: '', password: '', tosAccepted: false });
+  const [form, setForm] = useState({ username: '', email: '', password: '', tosAccepted: false, stayLoggedIn: true });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login, register } = useAuthStore();
@@ -36,7 +36,7 @@ export default function AuthPage() {
     setLoading(true);
     try {
       if (mode === 'login') {
-        await login(form.username, form.password);
+        await login(form.username, form.password, form.stayLoggedIn);
       } else {
         await register(form.username, form.email, form.password, true);
       }
@@ -88,7 +88,6 @@ export default function AuthPage() {
           </div>
 
           <form onSubmit={submit}>
-            {/* Email — always shown on register, shown on login too for UX clarity */}
             {mode === 'register' && (
               <div className="form-group">
                 <label className="form-label">
@@ -127,7 +126,6 @@ export default function AuthPage() {
               />
             </div>
 
-            {/* Password strength checklist (register only) */}
             {mode === 'register' && form.password.length > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 3, marginBottom: 14, padding: '10px 12px', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
                 <PwRule ok={pwChecks.length} label="At least 8 characters" />
@@ -153,6 +151,21 @@ export default function AuthPage() {
                     <Link to="/privacy" target="_blank" style={{ color: 'var(--color-accent)' }}>Privacy Policy</Link>.
                     I understand that NYX uses end-to-end encryption and my private key cannot be recovered if I lose my password.
                   </span>
+                </label>
+              </div>
+            )}
+
+            {/* Stay logged in (login mode only) */}
+            {mode === 'login' && (
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'flex', gap: 10, alignItems: 'center', cursor: 'pointer', fontSize: 13, color: 'var(--color-text-muted)' }}>
+                  <input
+                    type="checkbox"
+                    checked={form.stayLoggedIn}
+                    onChange={setCheck('stayLoggedIn')}
+                    style={{ width: 'auto', flexShrink: 0, accentColor: 'var(--color-accent)' }}
+                  />
+                  Stay logged in
                 </label>
               </div>
             )}
@@ -185,7 +198,7 @@ export default function AuthPage() {
           {' · '}
           <Link to="/privacy" style={{ color: 'var(--color-text-faint)' }}>Privacy</Link>
           {' · '}
-          nyx.spygroup.dev
+          nyx.spygaming.dev
         </div>
       </div>
     </div>

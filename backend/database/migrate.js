@@ -13,6 +13,8 @@ const FILES = [
   '005_account_deletion.sql',
   '006_email_reports_mutes_automod.sql',
   '007_channel_permissions.sql',
+  '008_friends.sql',
+  '009_custom_ids.sql',
 ];
 
 export async function migrate() {

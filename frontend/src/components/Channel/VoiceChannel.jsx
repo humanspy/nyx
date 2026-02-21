@@ -8,6 +8,7 @@ import TextChannel from './TextChannel.jsx';
 import MusicPlayer from '../Voice/MusicPlayer.jsx';
 import { getInitials } from '../../utils/helpers.js';
 import ChannelSettings from './ChannelSettings.jsx';
+import { playJoin, playLeave } from '../../utils/sounds.js';
 
 export default function VoiceChannel({ channel, sendTypingStart, sendTypingStop, sendMusicCommand }) {
   const { activeServerId, getPairedVoiceTextChannel, members } = useServerStore();
@@ -50,11 +51,13 @@ export default function VoiceChannel({ channel, sendTypingStart, sendTypingStop,
     if (atLimit) return;
     const existing = serverParticipants.filter(p => p.userId !== user?.id);
     await join(channel.id, existing, false);
+    playJoin();
     window.dispatchEvent(new CustomEvent('nexus:voice:join_out', { detail: { channelId: channel.id, serverId: activeServerId } }));
   }
 
   async function handleLeave() {
     leave();
+    playLeave();
     window.dispatchEvent(new CustomEvent('nexus:voice:leave_out', { detail: { channelId: channel.id } }));
   }
 

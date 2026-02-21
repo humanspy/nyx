@@ -124,6 +124,17 @@ router.post('/me/reactivate', async (req, res) => {
   res.json({ ok: true });
 });
 
+// GET /api/users/search?q= — find users by username prefix
+router.get('/search', async (req, res) => {
+  const { q } = req.query;
+  if (!q || q.length < 2) return res.json([]);
+  const { rows } = await pool.query(
+    'SELECT id, username, display_name, avatar_url FROM users WHERE username ILIKE $1 AND id != $2 AND deletion_scheduled_at IS NULL LIMIT 10',
+    [`${q.trim()}%`, req.user.id]
+  );
+  res.json(rows);
+});
+
 router.get('/:userId', async (req, res) => {
   const { rows } = await pool.query(
     'SELECT id, username, display_name, avatar_url, banner_url, created_at FROM users WHERE id = $1',

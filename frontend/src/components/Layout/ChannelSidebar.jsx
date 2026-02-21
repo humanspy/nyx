@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import {
   Hash, Volume2, MessageSquareDot, ChevronDown, ChevronRight,
   Plus, Rss, BellOff, Bell, Trash2, Edit2, Copy, UserPlus,
-  Settings, EyeOff, Eye, LogOut,
+  Settings, EyeOff, Eye, LogOut, BookOpen,
 } from 'lucide-react';
 import { useServerStore } from '../../store/serverStore.js';
 import { useAuthStore } from '../../store/authStore.js';
 import { useMuteStore } from '../../store/muteStore.js';
 import ServerSettings from '../Server/ServerSettings.jsx';
 import ChannelSettings from '../Channel/ChannelSettings.jsx';
-import { channelsApi, serversApi } from '../../utils/api.js';
+import { channelsApi, serversApi, voiceApi } from '../../utils/api.js';
 
 const CHANNEL_ICONS = {
   text: Hash,
@@ -19,6 +19,11 @@ const CHANNEL_ICONS = {
   announcement: Rss,
   voice_text: MessageSquareDot,
 };
+
+function getChannelIcon(ch) {
+  if (ch.type === 'text' && /\brules?\b/i.test(ch.name)) return BookOpen;
+  return CHANNEL_ICONS[ch.type] || Hash;
+}
 
 const HIDDEN_KEY = (serverId) => `nyx_hidden_channels_${serverId}`;
 
@@ -35,8 +40,49 @@ export default function ChannelSidebar() {
   const [hiddenChannels, setHiddenChannels] = useState({});
   const [showHidden, setShowHidden] = useState(false);
   const [serverCtxMenu, setServerCtxMenu] = useState(null);
+  const [voiceParticipants, setVoiceParticipants] = useState({}); // { [channelId]: [{userId,username,avatar_url}] }
 
   useEffect(() => { fetchMutes(); }, [activeServerId]);
+
+  // Fetch initial voice participants for all voice channels in this server
+  useEffect(() => {
+    if (!activeServerId) return;
+    const voiceChannels = (channels[activeServerId] || []).filter(c => c.type === 'voice');
+    Promise.all(voiceChannels.map(ch =>
+      voiceApi.getParticipants(ch.id).then(p => ({ id: ch.id, participants: p || [] })).catch(() => ({ id: ch.id, participants: [] }))
+    )).then(results => {
+      const map = {};
+      results.forEach(({ id, participants }) => { map[id] = participants; });
+      setVoiceParticipants(map);
+    });
+  }, [activeServerId, channels]);
+
+  // Listen to real-time voice join/leave events
+  useEffect(() => {
+    function onJoin(e) {
+      const { data } = e.detail || {};
+      if (!data) return;
+      setVoiceParticipants(prev => {
+        const cur = prev[data.channelId] || [];
+        if (cur.some(p => p.userId === data.userId)) return prev;
+        return { ...prev, [data.channelId]: [...cur, data] };
+      });
+    }
+    function onLeave(e) {
+      const { data } = e.detail || {};
+      if (!data) return;
+      setVoiceParticipants(prev => {
+        const cur = prev[data.channelId] || [];
+        return { ...prev, [data.channelId]: cur.filter(p => p.userId !== data.userId) };
+      });
+    }
+    window.addEventListener('nexus:voice:voice_join', onJoin);
+    window.addEventListener('nexus:voice:voice_leave', onLeave);
+    return () => {
+      window.removeEventListener('nexus:voice:voice_join', onJoin);
+      window.removeEventListener('nexus:voice:voice_leave', onLeave);
+    };
+  }, []);
   useEffect(() => {
     if (activeServerId) {
       const saved = JSON.parse(localStorage.getItem(HIDDEN_KEY(activeServerId)) || '{}');
@@ -100,13 +146,14 @@ export default function ChannelSidebar() {
   }));
 
   function renderChannel(ch) {
-    const Icon = CHANNEL_ICONS[ch.type] || Hash;
+    const Icon = getChannelIcon(ch);
     const active = activeChannelId === ch.id;
     const muted = isMuted('channel', ch.id);
     const hidden = hiddenChannels[ch.id];
     const pairedTextCh = ch.type === 'voice'
       ? serverChannels.find(c => c.paired_voice_channel_id === ch.id)
       : null;
+    const vcParticipants = ch.type === 'voice' ? (voiceParticipants[ch.id] || []) : [];
 
     if (hidden && !showHidden) return null;
 
@@ -170,6 +217,23 @@ export default function ChannelSidebar() {
           >
             <Hash size={13} style={{ flexShrink: 0, opacity: 0.6 }} />
             <span style={{ fontSize: 13, opacity: 0.85, flex: 1 }} className="truncate">{pairedTextCh.name}</span>
+          </div>
+        )}
+        {vcParticipants.length > 0 && (
+          <div style={{ paddingLeft: 24, paddingBottom: 2 }}>
+            {vcParticipants.map(p => (
+              <div key={p.userId} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '2px 6px', borderRadius: 4 }}>
+                {p.avatar_url
+                  ? <img src={p.avatar_url} alt="" style={{ width: 16, height: 16, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                  : <div style={{ width: 16, height: 16, borderRadius: '50%', background: 'var(--color-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 700, color: '#fff', flexShrink: 0 }}>
+                      {(p.username || '?')[0].toUpperCase()}
+                    </div>
+                }
+                <span style={{ fontSize: 12, color: 'var(--color-text-faint)', flex: 1 }} className="truncate">
+                  {p.username || 'Unknown'}
+                </span>
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -289,7 +353,8 @@ export default function ChannelSidebar() {
             else deleteChannel(ctxMenu.id);
           }}
           onCopyId={() => copyToClipboard(ctxMenu.id)}
-          onCreateChannel={() => { setModal({ type: 'create-channel', data: {} }); setCtxMenu(null); }}
+          onCreateChannel={() => { setModal({ type: 'create-channel', data: { categoryId: ctxMenu.type === 'category' ? ctxMenu.id : undefined, channelType: 'text' } }); setCtxMenu(null); }}
+          onCreateVoiceChannel={() => { setModal({ type: 'create-channel', data: { categoryId: ctxMenu.type === 'category' ? ctxMenu.id : undefined, channelType: 'voice' } }); setCtxMenu(null); }}
         />
       )}
 
@@ -348,7 +413,7 @@ function ServerContextMenu({ x, y, isOwner, isMuted, onClose, onSettings, onCrea
   );
 }
 
-function ChannelContextMenu({ ctxMenu, isOwner, isMuted, isHidden, collapsed, onClose, onToggleMute, onToggleHide, onToggleCollapse, onEdit, onDelete, onCopyId, onCreateChannel }) {
+function ChannelContextMenu({ ctxMenu, isOwner, isMuted, isHidden, collapsed, onClose, onToggleMute, onToggleHide, onToggleCollapse, onEdit, onDelete, onCopyId, onCreateChannel, onCreateVoiceChannel }) {
   const ref = useRef(null);
   useEffect(() => {
     function h(e) { if (ref.current && !ref.current.contains(e.target)) onClose(); }
@@ -356,7 +421,7 @@ function ChannelContextMenu({ ctxMenu, isOwner, isMuted, isHidden, collapsed, on
     return () => document.removeEventListener('mousedown', h);
   }, []);
   const isCategory = ctxMenu.type === 'category';
-  const top = Math.min(ctxMenu.y, window.innerHeight - 320);
+  const top = Math.min(ctxMenu.y, window.innerHeight - 340);
   return (
     <div ref={ref} style={{ position: 'fixed', zIndex: 3000, top, left: ctxMenu.x, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.5)', minWidth: 200, padding: '4px 0' }}>
       {isCategory ? (
@@ -364,6 +429,9 @@ function ChannelContextMenu({ ctxMenu, isOwner, isMuted, isHidden, collapsed, on
           <MenuItem onClick={onToggleCollapse}>{collapsed ? 'Expand Category' : 'Collapse Category'}</MenuItem>
           <Divider />
           <MenuItem icon={isMuted ? <Bell size={15} /> : <BellOff size={15} />} onClick={onToggleMute}>{isMuted ? 'Unmute Category' : 'Mute Category'}</MenuItem>
+          <Divider />
+          {isOwner && <MenuItem icon={<Hash size={14} />} onClick={onCreateChannel}>Create Text Channel</MenuItem>}
+          {isOwner && <MenuItem icon={<Volume2 size={14} />} onClick={onCreateVoiceChannel}>Create Voice Channel</MenuItem>}
           <Divider />
           {isOwner && <MenuItem icon={<Edit2 size={15} />} onClick={onEdit}>Edit Category</MenuItem>}
           {isOwner && <MenuItem icon={<Trash2 size={15} />} onClick={onDelete} danger>Delete Category</MenuItem>}
@@ -376,7 +444,8 @@ function ChannelContextMenu({ ctxMenu, isOwner, isMuted, isHidden, collapsed, on
           <MenuItem icon={isHidden ? <Eye size={15} /> : <EyeOff size={15} />} onClick={onToggleHide}>{isHidden ? 'Show Channel' : 'Hide Channel'}</MenuItem>
           <Divider />
           {isOwner && <MenuItem icon={<Edit2 size={15} />} onClick={onEdit}>Edit Channel</MenuItem>}
-          {isOwner && <MenuItem icon={<Plus size={15} />} onClick={onCreateChannel}>Create Text Channel</MenuItem>}
+          {isOwner && <MenuItem icon={<Hash size={14} />} onClick={onCreateChannel}>Create Text Channel</MenuItem>}
+          {isOwner && <MenuItem icon={<Volume2 size={14} />} onClick={onCreateVoiceChannel}>Create Voice Channel</MenuItem>}
           {isOwner && <MenuItem icon={<Trash2 size={15} />} onClick={onDelete} danger>Delete Channel</MenuItem>}
           <Divider />
           <MenuItem icon={<Copy size={14} />} onClick={onCopyId} muted>Copy Channel ID</MenuItem>
@@ -388,7 +457,7 @@ function ChannelContextMenu({ ctxMenu, isOwner, isMuted, isHidden, collapsed, on
 
 function ChannelModal({ modal, serverId, categories, onClose, onDone }) {
   const [name, setName] = useState(modal.data?.name || '');
-  const [type, setType] = useState('text');
+  const [type, setType] = useState(modal.data?.channelType || 'text');
   const [categoryId, setCategoryId] = useState(modal.data?.categoryId || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');

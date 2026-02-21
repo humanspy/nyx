@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { Mic, MicOff, Headphones, HeadphoneOff, Settings } from 'lucide-react';
+import { Mic, MicOff, Headphones, HeadphoneOff, Settings, RefreshCw } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore.js';
 import { getInitials } from '../../utils/helpers.js';
 import SettingsModal from '../Settings/Settings.jsx';
@@ -13,7 +13,7 @@ const STATUS_OPTIONS = [
 ];
 
 export default function UserIndicator({ user }) {
-  const { settings, updateSettings } = useAuthStore();
+  const { settings, updateSettings, logout } = useAuthStore();
   const [showSettings, setShowSettings] = useState(false);
   const [muted, setMuted] = useState(false);
   const [deafened, setDeafened] = useState(false);
@@ -51,6 +51,17 @@ export default function UserIndicator({ user }) {
     setDeafened(next);
     next ? playDeafen() : playUndeafen();
     window.dispatchEvent(new CustomEvent('nexus:voice:local_deafen', { detail: { deafened: next } }));
+  }
+
+  function handleSwitchAccount() {
+    setShowStatusPicker(false);
+    // Save current account info for reference, then log out to allow re-login
+    const savedAccounts = JSON.parse(localStorage.getItem('nyx_saved_accounts') || '[]');
+    if (user?.id && !savedAccounts.some(a => a.userId === user.id)) {
+      savedAccounts.push({ username: user.display_name || user.username, userId: user.id, avatar_url: user.avatar_url });
+      localStorage.setItem('nyx_saved_accounts', JSON.stringify(savedAccounts));
+    }
+    logout();
   }
 
   if (!user) return null;
@@ -94,7 +105,7 @@ export default function UserIndicator({ user }) {
               position: 'absolute', bottom: 44, left: 0,
               background: 'var(--bg-secondary)', border: '1px solid var(--border-color)',
               borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
-              minWidth: 190, padding: '4px 0', zIndex: 200,
+              minWidth: 200, padding: '4px 0', zIndex: 200,
             }}>
               <div style={{ padding: '6px 12px', fontSize: 11, color: 'var(--color-text-faint)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Set Status
@@ -108,6 +119,15 @@ export default function UserIndicator({ user }) {
                   {opt.label}
                 </button>
               ))}
+              <div style={{ height: 1, background: 'var(--border-color)', margin: '4px 0' }} />
+              <button
+                onClick={handleSwitchAccount}
+                style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '8px 12px', fontSize: 13, color: 'var(--color-text-muted)', background: 'none', cursor: 'pointer' }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-hover)'; e.currentTarget.style.color = 'var(--color-text)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = 'var(--color-text-muted)'; }}
+              >
+                <RefreshCw size={13} /> Switch Accounts
+              </button>
             </div>
           )}
         </div>

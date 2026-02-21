@@ -209,3 +209,12 @@ export const automodApi = {
   get: (serverId) => api.get(`/automod/${serverId}`),
   update: (serverId, data) => api.put(`/automod/${serverId}`, data),
 };
+
+// Friends
+export const friendsApi = {
+  getAll: () => api.get('/friends'),
+  send: (username) => api.post('/friends', { username }),
+  accept: (userId) => api.put(`/friends/${userId}`),
+  remove: (userId) => api.delete(`/friends/${userId}`),
+  searchUsers: (q) => api.get(`/users/search?q=${encodeURIComponent(q)}`),
+};

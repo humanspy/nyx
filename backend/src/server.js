@@ -21,6 +21,7 @@ import reportsRouter from './routes/reports.js';
 import mutesRouter from './routes/mutes.js';
 import automodRouter from './routes/automod.js';
 import adminRouter from './routes/admin.js';
+import friendsRouter from './routes/friends.js';
 import { initGateway } from './websocket/gateway.js';
 import pool from './config/database.js';
 import { migrate } from '../database/migrate.js';
@@ -65,6 +66,7 @@ app.use('/api/reports', reportsRouter);
 app.use('/api/mutes', mutesRouter);
 app.use('/api/automod', automodRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/friends', friendsRouter);
 
 app.use((req, res) => res.status(404).json({ error: 'Not found' }));
 app.use((err, req, res, next) => {
