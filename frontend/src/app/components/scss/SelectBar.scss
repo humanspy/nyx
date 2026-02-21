@@ -1,0 +1,39 @@
+.selectBar {
+  display: flex;
+  height: 32px;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.8rem;
+  margin-left: 3px;
+
+  .divider {
+    width: 0.2rem;
+    height: 2.4rem;
+    margin: 0 8px;
+    background: #3f4147;
+  }
+
+  .mainBox {
+    display: flex;
+    gap: 15px;
+  }
+
+  .subBox {
+    display: flex;
+    margin-left: 1.3rem;
+    justify-content: center;
+    align-items: center;
+    gap: 0.8rem;
+
+    h2 {
+      color: white;
+      font-family: Pretendard-Mideum;
+      font-size: 1.6rem;
+      line-height: 2rem;
+    }
+
+    svg {
+      color: #80848e;
+    }
+  }
+}

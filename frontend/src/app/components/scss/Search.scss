@@ -1,0 +1,28 @@
+.search-container {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+
+  .searchBox {
+    display: flex;
+    width: 928px;
+    height: 3.4rem;
+    background: #1d1f23;
+    border-radius: 5px;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 10px;
+
+    input {
+      padding-left: 10px;
+      width: 95%;
+      height: 100%;
+      background: transparent;
+      border: none;
+      border-radius: 5px;
+      outline: none;
+      font-size: 1.6rem;
+      color: #fff;
+    }
+  }
+}

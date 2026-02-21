@@ -1,0 +1,11 @@
+.modal-backdrop {
+  position: fixed; /* 화면에 고정 */
+  display: flex;
+  width: 100%; /* 전체 너비 */
+  height: 100%; /* 전체 높이 */
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(1px);
+  z-index: 9999;
+}

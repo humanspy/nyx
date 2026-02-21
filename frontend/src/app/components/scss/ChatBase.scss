@@ -1,0 +1,51 @@
+.chatBase-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 31rem);
+  height: calc(100vh - 4.8rem);
+  background: #313339;
+
+  .chatBox {
+    position: relative;
+    //padding: 0 2.4rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: flex-start;
+    overflow-y: auto; // scroll 대신 auto 사용
+    overflow-x: hidden;
+    //margin-bottom: 2.4rem;
+    -webkit-overflow-scrolling: touch;
+
+    // Firefox 스크롤바 스타일링
+    scrollbar-width: thin;
+    scrollbar-color: #202225 transparent;
+
+    // Chrome, Safari 스크롤바 스타일링
+    &::-webkit-scrollbar {
+      width: 0.8rem;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #202225;
+      border-radius: 0.4rem;
+    }
+
+    .messages-container {
+      margin-top: auto; // 이 부분이 중요! 메시지들을 아래로 밀어냅니다
+      display: flex;
+      flex-direction: column;
+
+      &:has(+ .messageBoxContinue) {
+        .messageBox {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}

@@ -22,7 +22,9 @@ import mutesRouter from './routes/mutes.js';
 import automodRouter from './routes/automod.js';
 import adminRouter from './routes/admin.js';
 import friendsRouter from './routes/friends.js';
+import compatRouter from './routes/compat.js';
 import { initGateway } from './websocket/gateway.js';
+import { initChatGateway } from './websocket/chatGateway.js';
 import pool from './config/database.js';
 import { migrate } from '../database/migrate.js';
 
@@ -32,6 +34,7 @@ const httpServer = createServer(app);
 
 const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
 initGateway(wss);
+initChatGateway(httpServer);
 
 app.use(helmet({ crossOriginEmbedderPolicy: false, contentSecurityPolicy: false }));
 app.use(cors({
@@ -67,6 +70,7 @@ app.use('/api/mutes', mutesRouter);
 app.use('/api/automod', automodRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/friends', friendsRouter);
+app.use('/api', compatRouter);
 
 app.use((req, res) => res.status(404).json({ error: 'Not found' }));
 app.use((err, req, res, next) => {

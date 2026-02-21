@@ -1,0 +1,137 @@
+.addFriend-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 70%;
+  height: 100vh;
+  border-right: 1px solid #3f4146;
+
+  .addBox {
+    display: flex;
+    width: 100%;
+    min-height: 13rem;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 2rem;
+    margin-left: 3rem;
+    margin-right: 3rem;
+    border-bottom: 1px solid #3f4146;
+
+    .mainTextBox {
+      margin-left: 6rem;
+      width: 100%;
+      align-items: start;
+      h1 {
+        color: white;
+        font-size: 1.6rem;
+        line-height: 2rem;
+        font-family: Pretendard-Mideum;
+      }
+    }
+    .subTextBox {
+      margin-top: 0.8rem;
+      margin-left: 6rem;
+      width: 100%;
+      align-items: start;
+      p {
+        color: #b4b8c0;
+        font-size: 1.4rem;
+        line-height: 2rem;
+        font-family: Pretendard-Regular;
+      }
+    }
+
+    .inputBox {
+      position: relative;
+      margin-top: 1.6rem;
+      margin-left: auto;
+      margin-right: auto;
+      display: flex;
+      width: 100%;
+      max-width: 89.2rem;
+      height: 5rem;
+      padding: 0 1.2rem;
+      border: 0.5px solid #000;
+      border-radius: 0.8rem;
+      background: #1d1f23;
+      justify-content: space-between;
+      align-items: center;
+
+      transition: border-color 0.4s ease;
+      &:focus-within {
+        border: 1px solid #01a8fb;
+      }
+
+      &.success {
+        border: 1px solid #22a65a;
+      }
+
+      &.error {
+        border: 1px solid #f24044;
+      }
+
+      input {
+        width: calc(100% - 13.4rem); /* 버튼 너비 + 여백 고려 */
+        height: 4rem;
+        background: none;
+        border: none;
+        font-size: 1.6rem;
+        color: #b6b9c1;
+        font-family: 'Pretendard-Light';
+        &:focus {
+          outline: none;
+        }
+      }
+
+      input::placeholder {
+        color: rgba(229, 229, 229, 0.51);
+      }
+
+      button {
+        width: 12.2rem;
+        height: 3.2rem;
+        color: white;
+        font-family: Pretendard-SemiBold;
+        border: none;
+        outline: none;
+        border-radius: 0.4rem;
+        transition: 0.2s background ease;
+
+        &.searched:active {
+          background: rgba(88, 101, 242, 0.56) !important;
+        }
+
+        &:hover {
+          background: rgba(88, 101, 242, 0.77);
+        }
+      }
+    }
+
+    .stateText {
+      margin-top: 0.8rem;
+      margin-left: 6rem;
+      margin-bottom: 2.1rem;
+      width: 100%;
+      text-align: start;
+      font-size: 1.4rem;
+      font-family: 'Pretendard-Regular';
+      letter-spacing: -0.1px;
+
+      &.success {
+        color: #30c671;
+      }
+
+      &.error {
+        color: #ec7075;
+      }
+    }
+  }
+  .wumpusText {
+    margin-top: 4.8rem;
+    color: rgba(182, 185, 193, 0.72);
+    font-size: 1.6rem;
+    font-family: Pretendard-Regular;
+  }
+}
+

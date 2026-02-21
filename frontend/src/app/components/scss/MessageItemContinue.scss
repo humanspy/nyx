@@ -1,0 +1,47 @@
+.messageBoxContinue {
+  display: flex;
+  width: 100%;
+  margin-left: 1.6rem;
+
+  &.is-last {
+    margin-bottom: 1.7rem;
+  }
+
+  &:hover {
+    width: 100%;
+    background: rgba(43, 45, 49, 0.5);
+  }
+
+  div {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    gap: 0.9rem;
+
+    &:hover {
+      .messageTimestamp {
+        display: block;
+        opacity: 1;
+      }
+    }
+
+    .messageTimestamp {
+      opacity: 0;
+      color: #838992;
+      font-size: 1.2rem;
+      font-family: 'Pretendard-Regular';
+      line-height: 2.2rem;
+    }
+
+    .messageContent {
+      color: #dcdee2;
+      font-size: 1.6rem;
+      font-family: 'Pretendard-Regular';
+      line-height: 2.2rem;
+      user-select: text;
+      -webkit-user-select: text;
+      -moz-user-select: text;
+    }
+  }
+}

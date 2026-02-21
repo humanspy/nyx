@@ -1,0 +1,74 @@
+.date-picker {
+  position: relative;
+  display: flex;
+  width: 424px;
+  flex-direction: column;
+
+  label {
+    font-size: 12px;
+    font-family: Pretendard-SemiBold;
+    color: #b6b9c1;
+    margin-bottom: 10px;
+
+    .required {
+      padding-left: 4px;
+      color: #f23f42;
+    }
+  }
+
+  .picker-box {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center; // space-between에서 center로 변경
+    align-items: center;
+    gap: 10px; // 간격 조정  // 세로 방향으로 가운데 정렬
+
+    .inputBox {
+      position: relative;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      width: 30%; // 각 입력 필드의 너비를 동일하게 설정
+      flex: 1;
+
+      input[type="number"] {
+        -moz-appearance: textfield; /* Firefox */
+      }
+
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none; /* Chrome, Safari, Edge */
+        margin: 0; /* 기본 여백 제거 */
+      }
+
+      input {
+        width: 100%; // 변경
+        height: 20px;
+        padding: 10px;
+        background: #1d1f23;
+        color: rgba(255, 255, 255, 0.63);
+        font-size: 15px;
+        font-family: Pretendard-Mideum;
+        border-radius: 5px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        border: none;
+
+        &::placeholder {
+          font-size: 15px;
+          color: rgba(210, 210, 210, 0.74);
+        }
+      }
+
+      .icon {
+        position: absolute;
+        cursor: pointer;
+        top: 8px;
+        right: 10px;
+      }
+    }
+  }
+}

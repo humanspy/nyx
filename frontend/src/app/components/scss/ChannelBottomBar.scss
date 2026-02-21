@@ -1,0 +1,44 @@
+.cbb-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  height: 6.8rem;
+  padding: 0 2.4rem;
+
+  .search {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    height: 2.2rem;
+    padding: 1.1rem 1.6rem;
+    background: #383a40;
+    border-radius: 0.8rem;
+    gap: 1.7rem;
+
+    .icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 2.4rem;
+      height: 2.4rem;
+      background: #b6b9c1;
+      border-radius: 100%;
+      cursor: pointer;
+    }
+
+    input {
+      width: 100%;
+      height: 100%;
+      white-space: pre-wrap;        /* pre-line에서 변경 */
+      overflow-wrap: break-word;    /* 추가 */
+      word-break: break-all;        /* 추가 */
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 1.6rem;
+      color: #a7a9b0;
+      font-family: 'Pretendard-Regular';
+    }
+  }
+}

@@ -1,0 +1,52 @@
+.messageBox {
+  display: flex;
+  width: 100%;
+  min-height: 4.4rem; // height를 min-height로 변경
+  padding: 2px 2.4rem;
+  gap: 1.6rem;
+  //margin-bottom: 1.7rem;
+
+  &.no-margin {
+    margin-bottom: 0;
+  }
+
+  &:hover {
+    width: 100%;
+    background: rgba(43, 45, 49, 0.5);
+  }
+
+  .profileImage {
+    padding: 0.4rem 0;
+    border-radius: 50%;
+  }
+
+  .messageDetail {
+    display: flex;
+    align-items: flex-end; // end 대신 flex-end 사용
+    gap: 0.8rem;
+
+    .messageUsername {
+      color: #ffffff;
+      font-size: 1.6rem;
+      font-family: 'Pretendard-Regular';
+      line-height: 2.2rem;
+    }
+
+    .messageTimestamp {
+      color: #838992;
+      font-size: 1.2rem;
+      font-family: 'Pretendard-Regular';
+      line-height: 2.2rem;
+    }
+  }
+
+  .messageContent {
+    color: #dcdee2;
+    font-size: 1.6rem;
+    font-family: 'Pretendard-Regular';
+    line-height: 2.2rem;
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+  }
+}

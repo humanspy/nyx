@@ -1,0 +1,58 @@
+.captchaModal-container {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 44rem;
+  height: 36rem;
+  border-radius: 0.4rem;
+  background: #313339;
+  z-index: 999;
+
+  .modalClose {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 2rem 2.4rem;
+    cursor: pointer;
+  }
+
+  .captchaModal {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .mainBox {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      svg {
+        margin-bottom: 2.7rem;
+      }
+
+      .textBox {
+        h1 {
+          color: white;
+          font-size: 2.4rem;
+          font-family: 'Pretendard-SemiBold';
+        }
+
+        h2 {
+          color: rgba(255, 255, 255, 0.83);
+          text-align: center;
+          font-size: 1.6rem;
+          font-family: 'Pretendard-Light';
+          margin-top: 0.8rem;
+        }
+      }
+    }
+
+    .captcha {
+      margin-top: 2.4rem;
+    }
+  }
+}
