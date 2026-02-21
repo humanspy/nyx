@@ -1,6 +1,6 @@
 # Dependency directories
 node_modules/
-frontend/.next/
+.next/
 
 # VS Code directory
 .vscode/
